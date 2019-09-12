@@ -275,10 +275,37 @@
                                 </a>
                             </li>
                             @endrole
-                            
-                            {{-- <li class="heading">
-                                <h3 class="uppercase">Layouts</h3>
-                            </li> --}}
+                            @role('admin')
+                            <li class="nav-item ">
+                                <a href="{{url('penilaian/list-grup')}}" class="nav-link nav-toggle">
+                                    <i class="icon-screen-smartphone"></i>
+                                    <span class="title">Scanner</span>
+                                    {{-- <span class="arrow"></span> --}}
+                                </a>
+                                <ul class="sub-menu">
+                                    <li class="nav-item start ">
+                                        <a href="{{url('scanner/registrasi')}}" class="nav-link ">
+                                            <i class="icon-note"></i>
+                                            <span class="title">Registrasi</span>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item start ">
+                                        <a href="{{url('scanner/snack')}}" class="nav-link ">
+                                            <i class="icon-social-dropbox"></i>
+                                            <span class="title">Snack</span>
+                                            {{-- <span class="badge badge-success">1</span> --}}
+                                        </a>
+                                    </li>
+                                    <li class="nav-item start ">
+                                        <a href="{{url('scanner/photobooth')}}" class="nav-link ">
+                                            <i class="icon-camera"></i>
+                                            <span class="title">Photobooth</span>
+                                            {{-- <span class="badge badge-danger">5</span> --}}
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            @endrole
                             
                         </ul>
                         <!-- END SIDEBAR MENU -->

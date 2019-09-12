@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\ParameterPenilaian;
 use App\EventPack;
 use App\Klub;
+use App\PenguranganPenilaian;
 use Yajra\Datatables\Datatables;
 
 class PenilaianController extends Controller
@@ -140,5 +141,22 @@ class PenilaianController extends Controller
         } else {
             return redirect()->route('penilaian.listgrup');
         }
+    }
+
+    public function penguranganNilai(Request $request)
+    {
+        try {
+            if ($request->jenis == 'tidak membawa teks') {
+                PenguranganPenilaian::create([
+                    'klub_id' => $request->id,
+                    'jenis' => $request->jenis,
+                    'jumlah' => 2,
+                ]);
+            }
+            return response("Pengurangan Nilai Berhasil Ditambahkan", 200);
+        } catch (\Exception $e) {
+            return response("Pengurangan Nilai Gagal Ditambahkan", 500);
+        }
+        
     }
 }

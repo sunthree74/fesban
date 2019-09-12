@@ -1,10 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-@role('petugas')
-<div id="scanner-player" style="padding-bottom: 30px">
-</div>
-@endrole
 @if (!isset(Auth::user()->klub))
     <div class="alert alert-block alert-danger fade in">
         <h4 class="alert-heading">Peringatan!</h4>
@@ -97,65 +93,6 @@
         <!-- /.modal-dialog -->
 </div>
 <script>
-    @role('petugas')
-    if( /Android|Mozilla|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
-      var a = '<div class="row"><div class="col-xs-12"><div class="embed-responsive embed-responsive-16by9"><video id="preview" class="embed-responsive-item"></video></div></div></div>';
-      $("#scanner-player").html(a)
-      let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
-      scanner.addListener('scan', function (content) {
-        // alert(content);
-        $.ajax({
-          url: content,
-          type: "GET",
-          success : function(a){
-            Swal.fire(
-              'Yeesss',
-              a,
-              'success'
-            )
-          },
-          error : function (a) {
-            if (a.status == 422) {
-              Swal.fire(
-                'Oopss!',
-                a.responseText,
-                'warning'
-              );
-            } else {
-              Swal.fire(
-                'Oopss!',
-                a.responseText,
-                'error'
-              );
-            }
-          }
-        });
-      });
-      Instascan.Camera.getCameras().then(function (cameras) {
-        if (cameras.length > 0) {
-          var selectedCam = cameras[0];
-          $.each(cameras, (i, c) => {
-              if (c.name.indexOf('back') != -1) {
-                  selectedCam = c;
-                  return false;
-              }
-          });
-
-          scanner.start(selectedCam);
-          // scanner.start(cameras[1]);
-        } else {
-          Swal.fire(
-            'Oopss!',
-            'Tidak dapat mendeteksi kamera',
-            'error'
-          );
-          console.error('No cameras found.');
-        }
-      }).catch(function (e) {
-        console.error(e);
-      });
-    }
-    @endrole
     jQuery(document).ready(function () {
         var table = $('#table-grup').DataTable({
             // dom: 'Bfrtip',
