@@ -3,6 +3,24 @@
 @section('content')
 <div id="scanner-player" style="padding-bottom: 30px">
 </div>
+<div class="portlet box blue ">
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="fa fa-gift"></i> Manual Input Id </div>
+    </div>
+    <div class="portlet-body form">
+        <form role="form" method="POST" action="">
+            <div class="form-body">
+                <div class="form-group">
+                    <input type="text" class="form-control" id="id-grup" placeholder="Id Grup" name="grup_number">
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="button" id="submit-manual" class="btn blue">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
 @if ($jenis == 'registrasi')
 <div class="portlet box blue ">
     <div class="portlet-title">
@@ -59,7 +77,7 @@
         if( /Android|Mozilla|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
         var a = '<div class="row"><div class="col-xs-12"><div class="embed-responsive embed-responsive-16by9"><video id="preview" class="embed-responsive-item"></video></div></div></div>';
         $("#scanner-player").html(a)
-        let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+        let scanner = new Instascan.Scanner({ video: document.getElementById('preview'), mirror: false });
         var url = "{{url('event-pack/check').'/'.$jenis.'/'}}";
         scanner.addListener('scan', function (content) {
             $.ajax({
@@ -71,14 +89,25 @@
                     $('#submit-form').attr("disabled", false);
                 },
                 error : function (a) {
-                    if (a.status == 422) {
-                    alert(a.responseText);
-                    } else {
-                    alert(a.responseText)
-                    }
+                    alert(a)
                 }
             });
         });
+        $("#submit-manual").click(function () {
+            var id = $("#id-grup").val();
+            $.ajax({
+                url: url+id,
+                type: "PUT",
+                success : function(a){
+                    alert(a.msg);
+                    $(".klub_id").val(a.klub_id);
+                    $('#submit-form').attr("disabled", false);
+                },
+                error : function (a) {
+                    alert(a)
+                }
+            });
+        })
         Instascan.Camera.getCameras().then(function (cameras) {
             if (cameras.length > 0) {
             var selectedCam = cameras[0];

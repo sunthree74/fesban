@@ -10,7 +10,10 @@
                                 <i class="icon-settings font-dark"></i>
                                 <span class="caption-subject bold uppercase">Daftar Peserta Lomba Festival Banjari Tahun {{date('Y')}}</span>
                             </div>
-                            <div class="tools"> </div>
+                            {{-- <div class="tools"> </div> --}}
+                            <div class="actions">
+                                <a class="btn btn-circle btn-default" href="{{url('penilaian/final')}}" target="_blank">Nilai Final</a>
+                            </div>
                         </div>
                         <div class="portlet-body">
                             <table class="table table-striped table-bordered table-hover" id="table-grup">
@@ -29,9 +32,62 @@
                     </div>
         </div>
     </div>
+    <div class="portlet box blue ">
+            <div class="portlet-title">
+                <div class="caption">
+                    <i class="fa fa-gift"></i> Pengurangan Nilai </div>
+                <div class="tools">
+                    <a href="" class="collapse"> </a>
+                </div>
+            </div>
+            <div class="portlet-body form">
+                <form role="form" method="POST" action="{{route('nilai.pengurangan.manual')}}">
+                    @csrf
+                    <div class="form-body">
+                        <div class="form-group @error('klub_id') has-error @enderror">
+                                <label class="control-label">Nama Grup</label>
+                                <select class="form-control" name="klub_id">
+                                    <option value="">-- Pilih Grup --</option>
+                                    @foreach ($grup as $g)
+                                        <option value="{{$g->id}}">{{$g->name}}</option>
+                                    @endforeach
+                                </select>
+                                @error('klub_id')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                        </div>
+                        <div class="form-group @error('jenis') has-error @enderror">
+                                <label class="control-label">Jenis Pengurangan</label>
+                                <select class="form-control" name="jenis">
+                                        <option value="">-- Pilih Jenis Pengurangan Nilai --</option>
+                                        <option value="melebihi batas waktu">Penampilan Melebihi Batas Waktu</option>
+                                        <option value="telat daftar atau datang">Telat Daftar Atau Datang</option>
+                                        <option value="latihan di area lomba">Memukul Alat di Area Lomba</option>
+                                        <option value="tidak membawa teks">Tidak Membawa Teks Sholawat</option>
+                                </select>
+                                @error('jenis')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn blue">Submit</button>
+                    </div>
+                </form>
+                <form action="" method="POST" id="pengurangan-form">
+                    <input type="hidden" name="jenis" value="tidak membawa teks">
+                    <input type="hidden" name="id" class="klub_id" required>
+                </form>
+            </div>
+        </div>
 <script>
+    var table;
     jQuery(document).ready(function () {
-        var table = $('#table-grup').DataTable({
+        table = $('#table-grup').DataTable({
             // dom: 'Bfrtip',
             responsive: true,
             processing: true,
@@ -72,76 +128,14 @@
                 }
             },
         });
-        $("#table-grup").on("click", "#edit", function (e) {
-                var csrf_token = $('meta[name="csrf-token"]').attr("content");
-                var id = $(this).data("value");
-                $("#id").val(id);
-        });
-        $("#table-grup").on("click", "#siap", function (e) {
-                var csrf_token = $('meta[name="csrf-token"]').attr("content");
-                var id = $(this).data("value");
-                $.ajax({
-                    url: "{{ url('lomba/ready') }}"+"/"+id,
-                    type: "GET",
-                    success : function(a){
-                        alert('ready');
-                        // $("#basic").modal('hide');
-                        // table.ajax.reload();
-                        // swal("Updated!", "Pembayaran berhasil diupdate.", "success");
-                    },
-                    error : function () {
-                        alert('error');
-                        // $("#basic").modal('hide');
-                        // swal("Error!", "Ada Kesalahan Sistem.", "error");
-                    }
-                })
-        });
-        $("#table-grup").on("click", "#play", function (e) {
-                var csrf_token = $('meta[name="csrf-token"]').attr("content");
-                var id = $(this).data("value");
-                $.ajax({
-                    url: "{{ url('lomba/play') }}"+"/"+id,
-                    type: "GET",
-                    success : function(a){
-                        alert('timer dimulai');
-                    },
-                    error : function () {
-                        alert('error');
-                    }
-                })
-        });
-        $("#table-grup").on("click", "#stop", function (e) {
-                var csrf_token = $('meta[name="csrf-token"]').attr("content");
-                var id = $(this).data("value");
-                $.ajax({
-                    url: "{{ url('lomba/stop') }}"+"/"+id,
-                    type: "GET",
-                    success : function(a){
-                        alert('timer berhenti');
-                    },
-                    error : function () {
-                        alert('error');
-                    }
-                })
-        });
-        $("#save").on("click", function (e) {
-                var csrf_token = $('meta[name="csrf-token"]').attr("content");
-                var id = $(this).data("value");
-                $.ajax({
-                    url: "{{ url('nomor-urut') }}",
-                    type: "PUT",
-                    data : $('#pembayaranform').serialize(),
-                    success : function(a){
-                        $("#basic").modal('hide');
-                        // table.ajax.reload();
-                        // swal("Updated!", "Pembayaran berhasil diupdate.", "success");
-                    },
-                    error : function () {
-                        $("#basic").modal('hide');
-                        // swal("Error!", "Ada Kesalahan Sistem.", "error");
-                    }
-                })
+    });
+    var pusher = new Pusher('394571fe7210979dd5ac', {
+                cluster: 'ap1',
+                forceTLS: true,
             });
+    var refreshTable = pusher.subscribe('refresh-table');
+    refreshTable.bind('App\\Events\\RefreshTable', function(data) {
+        table.ajax.reload();
     });
 </script>
 @endsection

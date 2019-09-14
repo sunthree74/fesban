@@ -249,76 +249,79 @@ class LombaController extends Controller
 
     public function eventPackCheck($jenis,$grupnumber)
     {
-        $k = Klub::where('grup_number', $grupnumber)->first();
-        $e = EventPack::where('klub_id', $k->id)->whereYear('created_at', date('Y'))->first();
-        $batasRegistrasi =date("14:40:00");
-        if ($jenis == 'registrasi') {
-            if ($e->registrasi == 'sudah') {
-                return response()->json([
-                    'msg' => "Grup ".$k->name." Sudah Melakukan Registrasi",
-                    'klub_id' => $k->id,
-                ]);
-            } else {
-                $e->registrasi = 'sudah';
-                $e->status = 'menunggu';
-                $e->save();
-                
-                if (date('H:i:s') > $batasRegistrasi) {
-                    PenguranganPenilaian::create([
-                        'klub_id' => $k->id,
-                        'jenis' => 'telat daftar atau datang',
-                        'jumlah' => 15,
-                    ]);
+        try {
+            $k = Klub::where('grup_number', $grupnumber)->first();
+            $e = EventPack::where('klub_id', $k->id)->whereYear('created_at', date('Y'))->first();
+            $batasRegistrasi =date("14:40:00");
+            if ($jenis == 'registrasi') {
+                if ($e->registrasi == 'sudah') {
                     return response()->json([
-                        'msg' => "Grup ".$k->name." Telah Melewati Batas Waktu Registrasi",
+                        'msg' => "Grup ".$k->name." Sudah Melakukan Registrasi",
+                        'klub_id' => $k->id,
+                    ]);
+                } else {
+                    $e->registrasi = 'sudah';
+                    $e->status = 'menunggu';
+                    $e->save();
+                    
+                    if (date('H:i:s') > $batasRegistrasi) {
+                        PenguranganPenilaian::create([
+                            'klub_id' => $k->id,
+                            'jenis' => 'telat daftar atau datang',
+                            'jumlah' => 15,
+                        ]);
+                        return response()->json([
+                            'msg' => "Grup ".$k->name." Telah Melewati Batas Waktu Registrasi",
+                            'klub_id' => $k->id,
+                        ]);
+                    }
+                    return response()->json([
+                        'msg' => "Registrasi Grup ".$k->name." Berhasil",
                         'klub_id' => $k->id,
                     ]);
                 }
-                return response()->json([
-                    'msg' => "Registrasi Grup ".$k->name." Berhasil",
-                    'klub_id' => $k->id,
-                ]);
-            }
-            
-        } else if ($jenis == 'snack') {
-            if ($e->snack == 'sudah') {
-                return response()->json([
-                    'msg' => "Snack Grup ".$k->name." Sudah Diambil. Tidak Bisa Melakukan Pengambilan Snack Dua Kali",
-                    'klub_id' => $k->id,
-                ]);
-            } else {
-                $e->snack = 'sudah';
-                $e->save();
-    
-                return response()->json([
-                    'msg' => "Pengambilan Snack Grup ".$k->name." Berhasil",
-                    'klub_id' => $k->id,
-                ]); 
-            }
-            
-        } else if ($jenis == 'photobooth') {
-            if ($e->photo == 'sudah') {
-                return response()->json([
-                    'msg' => "Photobooth Grup ".$k->name." Sudah Dilakukan. Tidak Bisa Melakukan Photobooth Dua Kali",
-                    'klub_id' => $k->id,
-                ]);
-            } else {
-                $e->photo = 'sudah';
-                $e->save();
-
-                return response()->json([
-                    'msg' => "Photobooth Grup ".$k->name." Berhasil",
-                    'klub_id' => $k->id,
-                ]);
-            }
-        }
+                
+            } else if ($jenis == 'snack') {
+                if ($e->snack == 'sudah') {
+                    return response()->json([
+                        'msg' => "Snack Grup ".$k->name." Sudah Diambil. Tidak Bisa Melakukan Pengambilan Snack Dua Kali",
+                        'klub_id' => $k->id,
+                    ]);
+                } else {
+                    $e->snack = 'sudah';
+                    $e->save();
         
+                    return response()->json([
+                        'msg' => "Pengambilan Snack Grup ".$k->name." Berhasil",
+                        'klub_id' => $k->id,
+                    ]); 
+                }
+                
+            } else if ($jenis == 'photobooth') {
+                if ($e->photo == 'sudah') {
+                    return response()->json([
+                        'msg' => "Photobooth Grup ".$k->name." Sudah Dilakukan. Tidak Bisa Melakukan Photobooth Dua Kali",
+                        'klub_id' => $k->id,
+                    ]);
+                } else {
+                    $e->photo = 'sudah';
+                    $e->save();
+
+                    return response()->json([
+                        'msg' => "Photobooth Grup ".$k->name." Berhasil",
+                        'klub_id' => $k->id,
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            return response("Ada Kesalahan Sistem. ", 500);
+        }
     }
 
     public function storeSholawat(Request $request)
     {
         try {
-            $e = EventPack::find($request->klub_id);
+            $e = EventPack::where('klub_id',$request->klub_id)->first();
             $s = $request->sholawat1."|".$request->sholawat2;
             $e->judul_lagu = $s;
             $e->save();

@@ -85,7 +85,7 @@
         $("#stop").click(function () {
             isPaused = true;
             var pengurangan;
-            if (minutes == 11 ) {
+            if (minutes >= 11 ) {
                 pengurangan = 'ada';
             } else {
                 pengurangan = 'tidak';

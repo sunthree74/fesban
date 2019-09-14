@@ -26,3 +26,7 @@ Broadcast::channel('grup-play', function ($user) {
 Broadcast::channel('grup-stop', function ($user) {
     return Auth::check();
 });
+
+Broadcast::channel('refresh-table', function ($user) {
+    return Auth::check();
+});

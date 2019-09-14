@@ -52,9 +52,12 @@ Route::put('event-pack/check/{jenis}/{grupnumber}', 'LombaController@eventPackCh
 Route::post('store/sholawat', 'LombaController@storeSholawat')->name('sholawat.store');
 
 Route::group(['prefix' => 'penilaian'], function () {
+    Route::post('store', 'PenilaianController@store')->name('penilaian.store');
     Route::get('list-grup', 'PenilaianController@index')->name('penilaian.listgrup');
     Route::get('list-peserta', 'PenilaianController@getGrup');
     Route::get('{jenis}/{id}', 'PenilaianController@create');
     Route::get('timer-calculation/{id}/{pengurangan}', 'PenilaianController@timerCalculation');
     Route::post('pengurangan', 'PenilaianController@penguranganNilai')->name('nilai.pengurangan');
+    Route::post('pengurangan-manual', 'PenilaianController@penguranganNilaiManual')->name('nilai.pengurangan.manual');
+    Route::get('final', 'PenilaianController@finalResult');
 });
